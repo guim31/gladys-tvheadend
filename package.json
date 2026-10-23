@@ -1,8 +1,8 @@
 {
-  "name": "gladys-integration-template-js",
+  "name": "gladys-tvheadend",
   "version": "1.0.0",
   "private": true,
-  "description": "Official starter template to build an external integration for Gladys Assistant with the JavaScript SDK.",
+  "description": "Tvheadend TV server in Gladys Assistant: recordings in progress and scheduled, free space, viewers, scene triggers and actions, a dashboard widget.",
   "type": "module",
   "main": "index.js",
   "scripts": {

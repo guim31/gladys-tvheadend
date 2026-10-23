@@ -1,0 +1,34 @@
+{
+  "boxid": "609ae996ada18e680bdaf63f5b2b8c288e77047c",
+  "messages": [
+    {
+      "uilevel": "basic",
+      "theme": "auto",
+      "page_size": 50,
+      "quicktips": 1,
+      "chname_num": 1,
+      "chname_src": 0,
+      "date_mask": "",
+      "label_formatting": 0,
+      "default_tab": 0,
+      "dvr_show_seconds": 1,
+      "username": "gladys",
+      "address": "192.0.2.14",
+      "dvr": 1,
+      "admin": 0,
+      "time": 1792761671,
+      "cookie_expires": 7,
+      "ticket_expires": 300,
+      "info_area": "login,storage,time",
+      "freediskspace": 47717732352,
+      "useddiskspace": 16405820,
+      "totaldiskspace": 502392610816,
+      "notificationClass": "accessUpdate"
+    },
+    {
+      "notificationClass": "setServerIpPort",
+      "ip": "192.0.2.13",
+      "port": 9981
+    }
+  ]
+}

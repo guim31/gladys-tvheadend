@@ -1,0 +1,68 @@
+{
+  "entries": [
+    {
+      "id": 13,
+      "start": 1792761645,
+      "errors": 0,
+      "state": "Running",
+      "username": "gladys",
+      "title": "DVR: Meteo test",
+      "channel": "Mire Test",
+      "service": "IPTV #1/Test IPTV/test.m3u - Mire Test/Service01",
+      "pids": [256, 257, 4096],
+      "profile": "pass",
+      "in": 103588,
+      "out": 103588,
+      "total_in": 2774692,
+      "total_out": 2774692
+    },
+    {
+      "id": 9,
+      "start": 1792761079,
+      "errors": 0,
+      "state": "Running",
+      "username": "gladys",
+      "title": "DVR: Emission coupee",
+      "channel": "Chaine Coupee",
+      "service": "IPTV #2/Test IPTV/test.m3u - Chaine Coupee/Service01",
+      "pids": [256, 257, 4096],
+      "profile": "pass",
+      "in": 0,
+      "out": 0,
+      "total_in": 3740448,
+      "total_out": 3740448
+    },
+    {
+      "id": 12,
+      "start": 1792761645,
+      "errors": 0,
+      "state": "Running",
+      "hostname": "192.0.2.14",
+      "username": "admin",
+      "client": "curl/8.23.0",
+      "title": "HTTP",
+      "channel": "Mire Test",
+      "service": "IPTV #1/Test IPTV/test.m3u - Mire Test/Service01",
+      "pids": [256, 257, 4096],
+      "profile": "pass",
+      "in": 103588,
+      "out": 103588,
+      "total_in": 2774692,
+      "total_out": 2774692
+    },
+    {
+      "id": 11,
+      "start": 1792761424,
+      "errors": 0,
+      "state": "Running",
+      "title": "epggrab",
+      "service": "IPTV #1/Test IPTV/test.m3u - Mire Test/Raw PID Subscription",
+      "pids": [0, 1, 16, 17, 18, 256, 257, 4096],
+      "in": 3760,
+      "out": 0,
+      "total_in": 23585916,
+      "total_out": 0
+    }
+  ],
+  "totalCount": 4
+}

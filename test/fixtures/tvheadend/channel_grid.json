@@ -1,0 +1,41 @@
+{
+  "entries": [
+    {
+      "uuid": "42fa3ab4c5edfb059c463b57d8664d0d",
+      "enabled": true,
+      "autoname": true,
+      "name": "Chaine Coupee",
+      "number": 0,
+      "icon": "file:///picons/chainecoupee.png",
+      "icon_public_url": "imagecache/1",
+      "epgauto": true,
+      "epglimit": 0,
+      "epggrab": [],
+      "dvr_pre_time": 0,
+      "dvr_pst_time": 0,
+      "epg_running": -1,
+      "services": ["19b14879a4311242e0a8cc1a9c45f296"],
+      "tags": [],
+      "bouquet": ""
+    },
+    {
+      "uuid": "1e60ef3a9907c4aa7c2dd2f1014391f5",
+      "enabled": true,
+      "autoname": true,
+      "name": "Mire Test",
+      "number": 0,
+      "icon": "file:///picons/miretest.png",
+      "icon_public_url": "imagecache/2",
+      "epgauto": true,
+      "epglimit": 0,
+      "epggrab": [],
+      "dvr_pre_time": 0,
+      "dvr_pst_time": 0,
+      "epg_running": -1,
+      "services": ["381dd28e1e40c45e469c1c00ecb0ea22"],
+      "tags": [],
+      "bouquet": ""
+    }
+  ],
+  "total": 2
+}
