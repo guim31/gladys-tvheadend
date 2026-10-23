@@ -1,0 +1,47 @@
+{
+  "entries": [
+    {
+      "uuid": "8e48b6039f2690baf04098099632f314",
+      "input": "IPTV #1",
+      "stream": "test.m3u - Mire Test in Test IPTV",
+      "subs": 3,
+      "weight": 500,
+      "pids": [0, 1, 16, 17, 18, 256, 257, 4096],
+      "signal": 0,
+      "signal_scale": 0,
+      "ber": 0,
+      "snr": 0,
+      "snr_scale": 0,
+      "unc": 0,
+      "bps": 708384,
+      "te": 0,
+      "cc": 0,
+      "ec_bit": 0,
+      "tc_bit": 0,
+      "ec_block": 0,
+      "tc_block": 0
+    },
+    {
+      "uuid": "04d12277c40240b163f5088f47e10631",
+      "input": "IPTV #2",
+      "stream": "test.m3u - Chaine Coupee in Test IPTV",
+      "subs": 1,
+      "weight": 500,
+      "pids": [0, 1, 16, 17, 18, 256, 257, 4096],
+      "signal": 0,
+      "signal_scale": 0,
+      "ber": 0,
+      "snr": 0,
+      "snr_scale": 0,
+      "unc": 0,
+      "bps": 0,
+      "te": 0,
+      "cc": 0,
+      "ec_bit": 0,
+      "tc_bit": 0,
+      "ec_block": 0,
+      "tc_block": 0
+    }
+  ],
+  "totalCount": 2
+}

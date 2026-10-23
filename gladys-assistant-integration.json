@@ -1,177 +1,876 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "Tvheadend",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Your Tvheadend recorder in Gladys: recordings, free space, viewers, and scenes on each recording.",
+    "fr": "Votre enregistreur Tvheadend dans Gladys : enregistrements, place libre, lectures et scènes.",
+    "de": "Dein Tvheadend-Rekorder in Gladys: Aufnahmen, freier Speicher, Zuschauer und Szenen.",
+    "es": "Su grabador Tvheadend en Gladys: grabaciones, espacio libre, reproducciones y escenas."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
+  "docker_image": "ghcr.io/guim31/gladys-tvheadend:1.0.0",
   "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-tvheadend/main/cover.png",
+  "categories": ["multimedia"],
+  "transports": ["local"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Your Tvheadend server",
+        "fr": "Votre serveur Tvheadend",
+        "de": "Dein Tvheadend-Server",
+        "es": "Su servidor Tvheadend"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Enter the address of Tvheadend (port 9981) and an account with the video recorder and web interface rights. An admin account also shows the viewers and the tuners in use. The server appears in the Discover tab.",
+        "fr": "Saisissez l'adresse de Tvheadend (port 9981) et un compte avec les droits d'enregistrement et d'interface web. Un compte administrateur montre aussi les lectures et les tuners utilisés. Le serveur apparaît dans l'onglet Découverte.",
+        "de": "Gib die Adresse von Tvheadend (Port 9981) und ein Konto mit Aufnahme- und Weboberflächen-Rechten ein. Ein Administratorkonto zeigt auch Zuschauer und belegte Tuner. Der Server erscheint im Tab „Entdecken“.",
+        "es": "Introduzca la dirección de Tvheadend (puerto 9981) y una cuenta con derechos de grabación e interfaz web. Una cuenta de administrador muestra también las reproducciones y los sintonizadores en uso. El servidor aparece en la pestaña Descubrir."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://github.com/guim31/gladys-tvheadend/blob/main/docs/en.md",
+          "label": {
+            "en": "Setup guide",
+            "fr": "Guide d'installation",
+            "de": "Einrichtungsanleitung",
+            "es": "Guía de instalación"
+          }
+        },
+        {
+          "url": "https://docs.tvheadend.org/",
+          "label": {
+            "en": "Tvheadend documentation",
+            "fr": "Documentation de Tvheadend",
+            "de": "Tvheadend-Dokumentation",
+            "es": "Documentación de Tvheadend"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "url",
+      "type": "string",
+      "label": {
+        "en": "Tvheadend address",
+        "fr": "Adresse de Tvheadend",
+        "de": "Tvheadend-Adresse",
+        "es": "Dirección de Tvheadend"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
+      "description": {
+        "en": "Address of the web interface of Tvheadend (port 9981 by default).",
+        "fr": "Adresse de l'interface web de Tvheadend (port 9981 par défaut).",
+        "de": "Adresse der Weboberfläche von Tvheadend (standardmäßig Port 9981).",
+        "es": "Dirección de la interfaz web de Tvheadend (puerto 9981 por defecto)."
+      },
+      "placeholder": {
+        "en": "e.g. http://192.168.1.2:9981",
+        "fr": "ex. http://192.168.1.2:9981",
+        "de": "z. B. http://192.168.1.2:9981",
+        "es": "p. ej. http://192.168.1.2:9981"
+      },
+      "required": true
     },
     {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
+      "key": "username",
+      "type": "string",
+      "label": {
+        "en": "User name",
+        "fr": "Identifiant",
+        "de": "Benutzername",
+        "es": "Usuario"
       },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
+      "description": {
+        "en": "A Tvheadend user (Configuration → Users → Access entries).",
+        "fr": "Un utilisateur de Tvheadend (Configuration → Utilisateurs → Accès).",
+        "de": "Ein Tvheadend-Benutzer (Konfiguration → Benutzer → Zugangseinträge).",
+        "es": "Un usuario de Tvheadend (Configuración → Usuarios → Entradas de acceso)."
+      },
+      "required": true
     },
     {
-      "key": "unit",
+      "key": "password",
+      "type": "secret",
+      "label": {
+        "en": "Password",
+        "fr": "Mot de passe",
+        "de": "Passwort",
+        "es": "Contraseña"
+      },
+      "required": true
+    },
+    {
+      "key": "options",
+      "type": "section",
+      "label": {
+        "en": "Options",
+        "fr": "Options",
+        "de": "Optionen",
+        "es": "Opciones"
+      }
+    },
+    {
+      "key": "poll_interval",
       "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
+      "label": {
+        "en": "Refresh interval",
+        "fr": "Intervalle de rafraîchissement",
+        "de": "Aktualisierungsintervall",
+        "es": "Intervalo de actualización"
+      },
+      "description": {
+        "en": "How often Tvheadend is read: a few light requests each time.",
+        "fr": "À quelle fréquence Tvheadend est lu : quelques requêtes légères à chaque fois.",
+        "de": "Wie oft Tvheadend gelesen wird: jedes Mal ein paar leichte Anfragen.",
+        "es": "Con qué frecuencia se lee Tvheadend: unas pocas peticiones ligeras cada vez."
+      },
       "required": false,
-      "default": "celsius",
+      "default": "30",
       "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+        {
+          "value": "15",
+          "label": {
+            "en": "15 seconds",
+            "fr": "15 secondes",
+            "de": "15 Sekunden",
+            "es": "15 segundos"
+          }
+        },
+        {
+          "value": "30",
+          "label": {
+            "en": "30 seconds",
+            "fr": "30 secondes",
+            "de": "30 Sekunden",
+            "es": "30 segundos"
+          }
+        },
+        {
+          "value": "60",
+          "label": {
+            "en": "1 minute",
+            "fr": "1 minute",
+            "de": "1 Minute",
+            "es": "1 minuto"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the names",
+        "fr": "Langue des noms",
+        "de": "Sprache der Namen",
+        "es": "Idioma de los nombres"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "Language of the feature names (set when the device is added), of the dates and of the scene results.",
+        "fr": "Langue des noms des fonctionnalités (fixés à l'ajout de l'appareil), des dates et des résultats de scène.",
+        "de": "Sprache der Funktionsnamen (beim Anlegen des Geräts festgelegt), der Daten und der Szenen-Ergebnisse.",
+        "es": "Idioma de los nombres de las funciones (fijados al añadir el dispositivo), de las fechas y de los resultados de escena."
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": "fr",
+      "options": [
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "Anglais",
+            "de": "Englisch",
+            "es": "Inglés"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "French",
+            "fr": "Français",
+            "de": "Französisch",
+            "es": "Francés"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "German",
+            "fr": "Allemand",
+            "de": "Deutsch",
+            "es": "Alemán"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Spanish",
+            "fr": "Espagnol",
+            "de": "Spanisch",
+            "es": "Español"
+          }
+        }
+      ]
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
       "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "recording_started",
+      "label": {
+        "en": "A recording starts",
+        "fr": "Un enregistrement démarre",
+        "de": "Eine Aufnahme startet",
+        "es": "Empieza una grabación"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "Tvheadend starts recording a programme.",
+        "fr": "Tvheadend commence à enregistrer un programme.",
+        "de": "Tvheadend beginnt, eine Sendung aufzunehmen.",
+        "es": "Tvheadend empieza a grabar un programa."
       },
       "fields": [
         {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel (optional)",
+            "fr": "Chaîne (facultatif)",
+            "de": "Sender (optional)",
+            "es": "Canal (opcional)"
+          },
+          "description": {
+            "en": "The channel name as Tvheadend shows it. Empty: every channel.",
+            "fr": "Le nom de la chaîne tel que Tvheadend l'affiche. Vide : toutes les chaînes.",
+            "de": "Der Sendername, wie Tvheadend ihn anzeigt. Leer: alle Sender.",
+            "es": "El nombre del canal tal como lo muestra Tvheadend. Vacío: todos los canales."
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title",
+            "fr": "Titre",
+            "de": "Titel",
+            "es": "Título"
+          }
         },
         {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel",
+            "fr": "Chaîne",
+            "de": "Sender",
+            "es": "Canal"
+          }
+        },
+        {
+          "key": "stop_time",
+          "type": "string",
+          "label": {
+            "en": "Ends at",
+            "fr": "Se termine à",
+            "de": "Endet um",
+            "es": "Termina a las"
+          }
+        },
+        {
+          "key": "duration_minutes",
+          "type": "number",
+          "label": {
+            "en": "Duration (minutes)",
+            "fr": "Durée (minutes)",
+            "de": "Dauer (Minuten)",
+            "es": "Duración (minutos)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "recording_finished",
+      "label": {
+        "en": "A recording finishes",
+        "fr": "Un enregistrement se termine",
+        "de": "Eine Aufnahme ist fertig",
+        "es": "Termina una grabación"
+      },
+      "description": {
+        "en": "A recording ended and its file is on the disk (possibly with a few stream errors).",
+        "fr": "Un enregistrement est terminé et son fichier est sur le disque (avec parfois quelques erreurs de flux).",
+        "de": "Eine Aufnahme ist beendet und ihre Datei liegt auf der Festplatte (eventuell mit ein paar Stream-Fehlern).",
+        "es": "Una grabación ha terminado y su archivo está en el disco (a veces con algunos errores de flujo)."
+      },
+      "fields": [
+        {
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel (optional)",
+            "fr": "Chaîne (facultatif)",
+            "de": "Sender (optional)",
+            "es": "Canal (opcional)"
+          },
+          "description": {
+            "en": "The channel name as Tvheadend shows it. Empty: every channel.",
+            "fr": "Le nom de la chaîne tel que Tvheadend l'affiche. Vide : toutes les chaînes.",
+            "de": "Der Sendername, wie Tvheadend ihn anzeigt. Leer: alle Sender.",
+            "es": "El nombre del canal tal como lo muestra Tvheadend. Vacío: todos los canales."
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title",
+            "fr": "Titre",
+            "de": "Titel",
+            "es": "Título"
+          }
+        },
+        {
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel",
+            "fr": "Chaîne",
+            "de": "Sender",
+            "es": "Canal"
+          }
+        },
+        {
+          "key": "duration_minutes",
+          "type": "number",
+          "label": {
+            "en": "Duration (minutes)",
+            "fr": "Durée (minutes)",
+            "de": "Dauer (Minuten)",
+            "es": "Duración (minutos)"
+          }
+        },
+        {
+          "key": "errors",
+          "type": "number",
+          "label": {
+            "en": "Stream errors",
+            "fr": "Erreurs de flux",
+            "de": "Stream-Fehler",
+            "es": "Errores de flujo"
+          }
+        }
+      ]
+    },
+    {
+      "key": "recording_failed",
+      "label": {
+        "en": "A recording fails",
+        "fr": "Un enregistrement échoue",
+        "de": "Eine Aufnahme schlägt fehl",
+        "es": "Falla una grabación"
+      },
+      "description": {
+        "en": "A recording ended in error: no signal, no tuner free, file not created, time missed…",
+        "fr": "Un enregistrement s'est terminé en erreur : pas de signal, aucun tuner libre, fichier non créé, horaire manqué…",
+        "de": "Eine Aufnahme endete mit einem Fehler: kein Signal, kein Tuner frei, Datei nicht erstellt, Zeit verpasst…",
+        "es": "Una grabación terminó con error: sin señal, sin sintonizador libre, archivo no creado, hora perdida…"
+      },
+      "fields": [
+        {
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel (optional)",
+            "fr": "Chaîne (facultatif)",
+            "de": "Sender (optional)",
+            "es": "Canal (opcional)"
+          },
+          "description": {
+            "en": "The channel name as Tvheadend shows it. Empty: every channel.",
+            "fr": "Le nom de la chaîne tel que Tvheadend l'affiche. Vide : toutes les chaînes.",
+            "de": "Der Sendername, wie Tvheadend ihn anzeigt. Leer: alle Sender.",
+            "es": "El nombre del canal tal como lo muestra Tvheadend. Vacío: todos los canales."
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title",
+            "fr": "Titre",
+            "de": "Titel",
+            "es": "Título"
+          }
+        },
+        {
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel",
+            "fr": "Chaîne",
+            "de": "Sender",
+            "es": "Canal"
+          }
+        },
+        {
+          "key": "reason",
+          "type": "string",
+          "label": {
+            "en": "Reason (Tvheadend, in English)",
+            "fr": "Raison (Tvheadend, en anglais)",
+            "de": "Grund (Tvheadend, auf Englisch)",
+            "es": "Motivo (Tvheadend, en inglés)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "viewer_started",
+      "label": {
+        "en": "Someone starts watching",
+        "fr": "Une lecture commence",
+        "de": "Jemand schaut fern",
+        "es": "Empieza una reproducción"
+      },
+      "description": {
+        "en": "A client (Kodi, a browser, a TV app…) starts watching a channel. Needs an admin account.",
+        "fr": "Un client (Kodi, un navigateur, une appli TV…) commence à regarder une chaîne. Demande un compte administrateur.",
+        "de": "Ein Client (Kodi, ein Browser, eine TV-App…) beginnt, einen Sender zu schauen. Braucht ein Administratorkonto.",
+        "es": "Un cliente (Kodi, un navegador, una aplicación de TV…) empieza a ver un canal. Requiere una cuenta de administrador."
+      },
+      "fields": [
+        {
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel (optional)",
+            "fr": "Chaîne (facultatif)",
+            "de": "Sender (optional)",
+            "es": "Canal (opcional)"
+          },
+          "description": {
+            "en": "The channel name as Tvheadend shows it. Empty: every channel.",
+            "fr": "Le nom de la chaîne tel que Tvheadend l'affiche. Vide : toutes les chaînes.",
+            "de": "Der Sendername, wie Tvheadend ihn anzeigt. Leer: alle Sender.",
+            "es": "El nombre del canal tal como lo muestra Tvheadend. Vacío: todos los canales."
+          },
+          "required": false
+        },
+        {
+          "key": "user",
+          "type": "string",
+          "label": {
+            "en": "Tvheadend user (optional)",
+            "fr": "Utilisateur Tvheadend (facultatif)",
+            "de": "Tvheadend-Benutzer (optional)",
+            "es": "Usuario de Tvheadend (opcional)"
+          },
+          "required": false
+        }
+      ],
+      "variables": [
+        {
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel",
+            "fr": "Chaîne",
+            "de": "Sender",
+            "es": "Canal"
+          }
+        },
+        {
+          "key": "user",
+          "type": "string",
+          "label": {
+            "en": "User",
+            "fr": "Utilisateur",
+            "de": "Benutzer",
+            "es": "Usuario"
+          }
+        },
+        {
+          "key": "client",
+          "type": "string",
+          "label": {
+            "en": "Client",
+            "fr": "Client",
+            "de": "Client",
+            "es": "Cliente"
+          }
+        }
+      ]
+    },
+    {
+      "key": "disk_space_low",
+      "label": {
+        "en": "Free space falls below a threshold",
+        "fr": "La place libre passe sous un seuil",
+        "de": "Freier Speicher unter einer Schwelle",
+        "es": "El espacio libre baja de un umbral"
+      },
+      "description": {
+        "en": "The free space of the recording directory falls below the chosen percentage (once, until it goes back above).",
+        "fr": "La place libre du dossier d'enregistrement passe sous le pourcentage choisi (une fois, jusqu'à ce qu'elle remonte).",
+        "de": "Der freie Speicher des Aufnahmeordners fällt unter den gewählten Prozentsatz (einmal, bis er wieder steigt).",
+        "es": "El espacio libre de la carpeta de grabación baja del porcentaje elegido (una vez, hasta que vuelva a subir)."
+      },
+      "fields": [
+        {
+          "key": "threshold",
+          "type": "select",
+          "label": {
+            "en": "Threshold",
+            "fr": "Seuil",
+            "de": "Schwelle",
+            "es": "Umbral"
+          },
+          "required": true,
+          "default": "10",
           "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
+            {
+              "value": "5",
+              "label": {
+                "en": "5 %",
+                "fr": "5 %",
+                "de": "5 %",
+                "es": "5 %"
+              }
+            },
+            {
+              "value": "10",
+              "label": {
+                "en": "10 %",
+                "fr": "10 %",
+                "de": "10 %",
+                "es": "10 %"
+              }
+            },
+            {
+              "value": "15",
+              "label": {
+                "en": "15 %",
+                "fr": "15 %",
+                "de": "15 %",
+                "es": "15 %"
+              }
+            },
+            {
+              "value": "20",
+              "label": {
+                "en": "20 %",
+                "fr": "20 %",
+                "de": "20 %",
+                "es": "20 %"
+              }
+            },
+            {
+              "value": "25",
+              "label": {
+                "en": "25 %",
+                "fr": "25 %",
+                "de": "25 %",
+                "es": "25 %"
+              }
+            }
           ]
         }
       ],
       "variables": [
         {
-          "key": "target",
-          "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "key": "threshold",
+          "type": "number",
+          "label": {
+            "en": "Threshold (%)",
+            "fr": "Seuil (%)",
+            "de": "Schwelle (%)",
+            "es": "Umbral (%)"
+          }
+        },
+        {
+          "key": "free_percent",
+          "type": "number",
+          "label": {
+            "en": "Free space (%)",
+            "fr": "Espace libre (%)",
+            "de": "Freier Speicher (%)",
+            "es": "Espacio libre (%)"
+          }
+        },
+        {
+          "key": "free_gb",
+          "type": "number",
+          "label": {
+            "en": "Free space (GB)",
+            "fr": "Espace libre (Go)",
+            "de": "Freier Speicher (GB)",
+            "es": "Espacio libre (GB)"
+          }
         }
       ]
     }
   ],
   "scene_actions": [
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "record_now",
+      "label": {
+        "en": "Record a channel now",
+        "fr": "Enregistrer une chaîne maintenant",
+        "de": "Sender jetzt aufnehmen",
+        "es": "Grabar un canal ahora"
       },
-      "timeout_seconds": 15,
+      "description": {
+        "en": "Records a channel from now on, for the chosen number of minutes.",
+        "fr": "Enregistre une chaîne à partir de maintenant, pendant le nombre de minutes choisi.",
+        "de": "Nimmt einen Sender ab jetzt für die gewählte Anzahl Minuten auf.",
+        "es": "Graba un canal desde ahora, durante el número de minutos elegido."
+      },
+      "timeout_seconds": 30,
       "fields": [
         {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel",
+            "fr": "Chaîne",
+            "de": "Sender",
+            "es": "Canal"
+          },
+          "description": {
+            "en": "Its name or number, as Tvheadend shows it.",
+            "fr": "Son nom ou son numéro, tel que Tvheadend l'affiche.",
+            "de": "Sein Name oder seine Nummer, wie Tvheadend sie anzeigt.",
+            "es": "Su nombre o su número, tal como lo muestra Tvheadend."
+          },
           "required": true
+        },
+        {
+          "key": "duration",
+          "type": "number",
+          "label": {
+            "en": "Duration (minutes)",
+            "fr": "Durée (minutes)",
+            "de": "Dauer (Minuten)",
+            "es": "Duración (minutos)"
+          },
+          "required": true,
+          "default": 60,
+          "min": 1,
+          "max": 720
+        },
+        {
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title (optional)",
+            "fr": "Titre (facultatif)",
+            "de": "Titel (optional)",
+            "es": "Título (opcional)"
+          },
+          "required": false
         }
       ],
       "outputs": [
         {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "key": "title",
+          "type": "string",
+          "label": {
+            "en": "Title",
+            "fr": "Titre",
+            "de": "Titel",
+            "es": "Título"
+          }
+        },
+        {
+          "key": "channel",
+          "type": "string",
+          "label": {
+            "en": "Channel",
+            "fr": "Chaîne",
+            "de": "Sender",
+            "es": "Canal"
+          }
+        },
+        {
+          "key": "start_time",
+          "type": "string",
+          "label": {
+            "en": "Starts at",
+            "fr": "Commence à",
+            "de": "Beginnt um",
+            "es": "Empieza a las"
+          }
+        },
+        {
+          "key": "stop_time",
+          "type": "string",
+          "label": {
+            "en": "Ends at",
+            "fr": "Se termine à",
+            "de": "Endet um",
+            "es": "Termina a las"
+          }
+        },
+        {
+          "key": "duration_minutes",
+          "type": "number",
+          "label": {
+            "en": "Duration (minutes)",
+            "fr": "Durée (minutes)",
+            "de": "Dauer (Minuten)",
+            "es": "Duración (minutos)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "get_recordings",
+      "label": {
+        "en": "Recordings summary",
+        "fr": "Point sur les enregistrements",
+        "de": "Aufnahmen-Überblick",
+        "es": "Resumen de grabaciones"
+      },
+      "description": {
+        "en": "Reads Tvheadend for the next actions: what records, what comes next, free space, and a ready-made sentence.",
+        "fr": "Lit Tvheadend pour les actions suivantes : ce qui enregistre, la suite, la place libre, et une phrase toute prête.",
+        "de": "Liest Tvheadend für die nächsten Aktionen: was aufnimmt, was folgt, freier Speicher und ein fertiger Satz.",
+        "es": "Lee Tvheadend para las siguientes acciones: lo que graba, lo siguiente, el espacio libre y una frase lista."
+      },
+      "timeout_seconds": 30,
+      "outputs": [
+        {
+          "key": "recording_count",
+          "type": "number",
+          "label": {
+            "en": "Recordings in progress",
+            "fr": "Enregistrements en cours",
+            "de": "Laufende Aufnahmen",
+            "es": "Grabaciones en curso"
+          }
+        },
+        {
+          "key": "scheduled_count",
+          "type": "number",
+          "label": {
+            "en": "Scheduled recordings",
+            "fr": "Enregistrements programmés",
+            "de": "Geplante Aufnahmen",
+            "es": "Grabaciones programadas"
+          }
+        },
+        {
+          "key": "current",
+          "type": "string",
+          "label": {
+            "en": "Now recording",
+            "fr": "En cours d'enregistrement",
+            "de": "Wird aufgenommen",
+            "es": "Grabando ahora"
+          }
+        },
+        {
+          "key": "next_title",
+          "type": "string",
+          "label": {
+            "en": "Next recording",
+            "fr": "Prochain enregistrement",
+            "de": "Nächste Aufnahme",
+            "es": "Próxima grabación"
+          }
+        },
+        {
+          "key": "next_channel",
+          "type": "string",
+          "label": {
+            "en": "Channel of the next one",
+            "fr": "Chaîne du prochain",
+            "de": "Sender der nächsten",
+            "es": "Canal de la próxima"
+          }
+        },
+        {
+          "key": "next_time",
+          "type": "string",
+          "label": {
+            "en": "Time of the next one",
+            "fr": "Heure du prochain",
+            "de": "Zeit der nächsten",
+            "es": "Hora de la próxima"
+          }
+        },
+        {
+          "key": "free_gb",
+          "type": "number",
+          "label": {
+            "en": "Free space (GB)",
+            "fr": "Espace libre (Go)",
+            "de": "Freier Speicher (GB)",
+            "es": "Espacio libre (GB)"
+          }
+        },
+        {
+          "key": "free_percent",
+          "type": "number",
+          "label": {
+            "en": "Free space (%)",
+            "fr": "Espace libre (%)",
+            "de": "Freier Speicher (%)",
+            "es": "Espacio libre (%)"
+          }
+        },
+        {
+          "key": "sentence",
+          "type": "string",
+          "label": {
+            "en": "Sentence",
+            "fr": "Phrase",
+            "de": "Satz",
+            "es": "Frase"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "recordings",
+      "label": {
+        "en": "Tvheadend recordings",
+        "fr": "Enregistrements Tvheadend",
+        "de": "Tvheadend-Aufnahmen",
+        "es": "Grabaciones Tvheadend"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "What records now, the next recordings and the free space.",
+        "fr": "Ce qui enregistre, les prochains enregistrements et la place libre.",
+        "de": "Was gerade aufnimmt, die nächsten Aufnahmen und der freie Speicher.",
+        "es": "Lo que graba ahora, las próximas grabaciones y el espacio libre."
+      },
+      "icon": "video"
     }
   ]
 }

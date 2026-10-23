@@ -1,67 +1,162 @@
-# Template de démonstration
+# Tvheadend
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+[Tvheadend](https://tvheadend.org) est le serveur TV et enregistreur libre de
+bien des maisons : il lit les tuners DVB (TNT, satellite, câble) et les listes
+IPTV, diffuse les chaînes vers Kodi, un navigateur ou une appli TV, et
+enregistre les programmes. Cette intégration amène votre enregistreur dans
+Gladys : ce qui enregistre, ce qui vient ensuite, les enregistrements en échec,
+la place libre, qui regarde quoi, et des scènes qui réagissent à un
+enregistrement qui démarre, se termine ou échoue, à une lecture qui commence ou
+à un disque qui se remplit.
 
-## Ce que vous obtenez
+Vous cherchez le programme TV ? Voyez
+[l'intégration Programme Télé](https://github.com/prohand/gladys-programmetele) :
+celle-ci ne le refait pas.
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+Testée contre un vrai Tvheadend 4.3 en Docker (image
+`lscr.io/linuxserver/tvheadend`), avec un réseau IPTV qui lit un flux de test
+servi par ffmpeg : enregistrements programmés, en cours, terminés, en échec, un
+flux coupé, une lecture, un compte administrateur et un compte limité à
+l'enregistrement. Développée sans tuner DVB : vos retours sont les bienvenus
+dans [les issues](https://github.com/guim31/gladys-tvheadend/issues).
 
-## Configuration
+## Ce qu'il vous faut
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+- Gladys Assistant 5.1.0 ou plus récent.
+- Tvheadend 4.2 ou plus récent, joignable depuis Gladys (port 9981 par défaut).
+- Un utilisateur Tvheadend avec un mot de passe, et une entrée d'accès avec les
+  droits **Interface web** et **Enregistreur vidéo** (basique, tous les
+  enregistrements, enregistrements en échec). Avec le droit **Admin**,
+  l'intégration montre aussi les lectures et les tuners utilisés.
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+## Mise en route
 
-## Actions
+### 1. Créer un utilisateur pour Gladys
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+Dans Tvheadend, **Configuration → Utilisateurs** :
 
-## Scènes
+- **Entrées d'accès → Ajouter** : nom d'utilisateur `gladys`, droits **Interface
+  web** et **Enregistreur vidéo** (cochez aussi « Tous les enregistrements » et
+  « Enregistrements en échec »), et **Admin** si vous voulez les lectures et les
+  tuners.
+- **Mots de passe → Ajouter** : le même nom d'utilisateur et un mot de passe.
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+### 2. Configurer l'intégration
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+Dans Gladys, ouvrez l'intégration et remplissez :
+
+- **Adresse de Tvheadend** : `http://192.168.1.2:9981` (une adresse sans port
+  prend 9981 ; une URL copiée depuis le navigateur fonctionne aussi).
+- **Identifiant** et **Mot de passe** : l'utilisateur créé plus haut.
+  L'authentification Digest comme Basic fonctionne.
+- **Intervalle de rafraîchissement** : 30 secondes par défaut.
+- **Langue des noms** : la langue des noms des fonctionnalités, des dates et
+  des résultats de scène.
+
+Puis utilisez **Tester la connexion** : elle lit Tvheadend et résume ce qui
+enregistre, la suite et la place libre.
+
+### 3. Ajouter l'appareil
+
+Ouvrez l'onglet **Découverte** : le serveur est un appareil, nommé
+`Tvheadend`. Ajoutez-le.
+
+## Les appareils
+
+| Fonctionnalité                  | Ce qu'elle dit                                                    |
+| ------------------------------- | ----------------------------------------------------------------- |
+| Joignable                       | Oui tant que Tvheadend répond                                     |
+| Enregistrements en cours        | Les enregistrements en cours                                      |
+| Enregistrements programmés      | Les enregistrements à venir (activés)                             |
+| Enregistrements en échec (24 h) | Les enregistrements terminés en erreur ces dernières 24 heures    |
+| En cours d’enregistrement       | « Titre (Chaîne) » de ce qui enregistre (« — » sinon)             |
+| Prochain enregistrement         | « Titre · Chaîne · ven. 20:30 » (« — » si rien n'est prévu)       |
+| Espace libre                    | La place libre du dossier d'enregistrement, en Go                 |
+| Espace libre (%)                | La même, en pourcentage                                           |
+| Lectures en cours               | Les personnes qui regardent une chaîne (Kodi, navigateur…), admin |
+| Tuners utilisés                 | Les tuners (entrées) occupés, compte administrateur               |
+
+Il n'y a pas d'appareil par tuner : Tvheadend ne liste que les tuners utilisés.
 
 ## Tableau de bord
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+Le widget **Enregistrements Tvheadend** montre ce qui enregistre (titre, chaîne
+et heure de fin), ou le prochain enregistrement ; des tuiles pour les
+enregistrements programmés, la place libre et (compte administrateur) les
+lectures ; puis une ligne par enregistrement en cours et à venir.
+
+## Scènes
+
+### Déclencheurs
+
+Les déclencheurs d'enregistrement peuvent être limités à une chaîne : tapez son
+nom tel que Tvheadend l'affiche (vide : toutes les chaînes).
+
+- **Un enregistrement démarre** : Tvheadend commence à enregistrer, avec le
+  titre, la chaîne, l'heure de fin et la durée prévue.
+- **Un enregistrement se termine** : un enregistrement est terminé et son
+  fichier est sur le disque, avec le titre, la chaîne, la durée et le nombre
+  d'erreurs de flux.
+- **Un enregistrement échoue** : un enregistrement s'est terminé en erreur (pas
+  de signal, aucun tuner libre, fichier non créé, horaire manqué…), avec la
+  raison donnée par Tvheadend, en anglais.
+- **Une lecture commence** : un client commence à regarder une chaîne, avec la
+  chaîne, l'utilisateur Tvheadend et le client. Limitable à une chaîne ou à un
+  utilisateur. Demande un compte administrateur.
+- **La place libre passe sous un seuil** : choisissez 5, 10, 15, 20 ou 25 % ; se
+  déclenche une fois, puis de nouveau seulement après être remontée au-dessus.
+
+L'intégration garde ce qu'elle a vu : un redémarrage de Gladys n'annonce pas
+deux fois un enregistrement, et un enregistrement terminé entre-temps est
+annoncé une fois.
+
+### Actions
+
+- **Enregistrer une chaîne maintenant** : enregistre une chaîne (son nom ou son
+  numéro, tel que Tvheadend l'affiche) à partir de maintenant, de 1 à 720
+  minutes, avec un titre facultatif. Donne le titre, la chaîne, les heures de
+  début et de fin.
+- **Point sur les enregistrements** : lit Tvheadend pour les actions suivantes :
+  enregistrements en cours et programmés, ce qui enregistre, le prochain
+  enregistrement (titre, chaîne, heure), la place libre, et une phrase toute
+  prête (« 1 enregistrement(s) en cours (JT), prochain : Film · TF1 · ven.
+  20:30, 120 Go libres (24 %) »).
+
+### Idées de scènes
+
+- **Alerte d'échec** : « Un enregistrement échoue » vous envoie un message avec
+  le titre et la raison, pour le relancer.
+- **Personne à 20 h 55** : quand l'alarme est activée, « Enregistrer une chaîne
+  maintenant » enregistre le journal pendant 40 minutes.
+- **Disque presque plein** : « La place libre passe sous un seuil » (10 %)
+  envoie une notification ; une scène du matin dit la phrase de « Point sur les
+  enregistrements ».
+- **Mode cinéma** : « Une lecture commence » sur le compte du salon tamise les
+  lumières.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **Tvheadend ne répond pas** : vérifiez l'adresse et le port 9981 depuis la
+  machine de Gladys.
+- **Identifiant ou mot de passe refusé (ou pas de droit d'interface web)** :
+  Tvheadend répond la même chose à un mauvais mot de passe et à un compte sans
+  le droit **Interface web** ; vérifiez les deux.
+- **Le compte n'a pas le droit d'enregistrement** : cochez **Enregistreur
+  vidéo** dans l'entrée d'accès de l'utilisateur.
+- **Ni lectures ni tuners** : le compte n'est pas administrateur (le test de la
+  connexion le dit) ; le reste fonctionne.
+- **Un enregistrement coupé en cours de route « se termine »** : Tvheadend
+  lui-même indique « Completed OK » pour un flux perdu pendant
+  l'enregistrement ; seul un flux absent au départ échoue.
+
+## Limites
+
+- Un seul serveur Tvheadend par intégration.
+- Tvheadend est lu à l'intervalle choisi (30 secondes par défaut), pas en temps
+  réel : une lecture plus courte que l'intervalle peut passer inaperçue.
+- La raison d'un échec est celle de Tvheadend, en anglais.
+- Pas d'appareil par tuner, ni signal ni SNR : Tvheadend ne liste que les tuners
+  utilisés.
+- L'action de scène programme un enregistrement ; elle n'en annule ni n'en
+  supprime aucun.
+- Sans lien avec le projet Tvheadend.

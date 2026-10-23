@@ -1,0 +1,159 @@
+# Tvheadend
+
+[Tvheadend](https://tvheadend.org) ist der freie TV-Server und Rekorder vieler
+Haushalte: Er liest DVB-Tuner (DVB-T, Satellit, Kabel) und IPTV-Listen, streamt
+die Sender an Kodi, einen Browser oder eine TV-App und nimmt Sendungen auf.
+Diese Integration bringt deinen Rekorder in Gladys: was gerade aufnimmt, was
+als Nächstes kommt, die fehlgeschlagenen Aufnahmen, den freien Speicher, wer
+was schaut, und Szenen, die auf eine startende, fertige oder fehlgeschlagene
+Aufnahme reagieren, auf jemanden, der fernsieht, oder auf eine volle
+Festplatte.
+
+Du suchst die TV-Zeitschrift? Sieh dir die
+[Integration Programme Télé](https://github.com/prohand/gladys-programmetele)
+an: Diese hier wiederholt sie nicht.
+
+Getestet mit einem echten Tvheadend 4.3 in Docker (Image
+`lscr.io/linuxserver/tvheadend`), mit einem IPTV-Netzwerk, das einen von ffmpeg
+gelieferten Teststream liest: geplante, laufende, fertige und fehlgeschlagene
+Aufnahmen, ein unterbrochener Stream, ein Zuschauer, ein Administratorkonto und
+ein reines Aufnahmekonto. Ohne DVB-Tuner entwickelt: Rückmeldungen sind
+willkommen in [den Issues](https://github.com/guim31/gladys-tvheadend/issues).
+
+## Was du brauchst
+
+- Gladys Assistant 5.1.0 oder neuer.
+- Tvheadend 4.2 oder neuer, von Gladys aus erreichbar (standardmäßig Port
+  9981).
+- Einen Tvheadend-Benutzer mit Passwort und einen Zugangseintrag mit den
+  Rechten **Weboberfläche** und **Videorekorder** (einfach, alle Aufnahmen,
+  fehlgeschlagene Aufnahmen). Mit dem Recht **Admin** zeigt die Integration
+  auch die Zuschauer und die belegten Tuner.
+
+## Erste Schritte
+
+### 1. Einen Benutzer für Gladys anlegen
+
+In Tvheadend, **Konfiguration → Benutzer**:
+
+- **Zugangseinträge → Hinzufügen**: Benutzername `gladys`, Rechte
+  **Weboberfläche** und **Videorekorder** (auch „Alle Aufnahmen“ und
+  „Fehlgeschlagene Aufnahmen“ ankreuzen), und **Admin**, wenn du die Zuschauer
+  und die Tuner sehen willst.
+- **Passwörter → Hinzufügen**: derselbe Benutzername und ein Passwort.
+
+### 2. Die Integration konfigurieren
+
+Öffne in Gladys die Integration und fülle aus:
+
+- **Tvheadend-Adresse**: `http://192.168.1.2:9981` (eine Adresse ohne Port
+  bekommt 9981; eine aus dem Browser kopierte URL funktioniert auch).
+- **Benutzername** und **Passwort**: der oben angelegte Benutzer. Digest- und
+  Basic-Authentifizierung funktionieren beide.
+- **Aktualisierungsintervall**: standardmäßig 30 Sekunden.
+- **Sprache der Namen**: die Sprache der Funktionsnamen, der Daten und der
+  Szenen-Ergebnisse.
+
+Nutze dann **Verbindung testen**: Der Test liest Tvheadend und fasst zusammen, was
+aufnimmt, was folgt und wie viel Speicher frei ist.
+
+### 3. Das Gerät hinzufügen
+
+Öffne den Tab **Entdecken**: Der Server ist ein Gerät namens `Tvheadend`. Füge
+es hinzu.
+
+## Die Geräte
+
+| Funktion                         | Was sie sagt                                                  |
+| -------------------------------- | ------------------------------------------------------------- |
+| Erreichbar                       | Ja, solange Tvheadend antwortet                               |
+| Laufende Aufnahmen               | Die gerade laufenden Aufnahmen                                |
+| Geplante Aufnahmen               | Die kommenden Aufnahmen (aktiviert)                           |
+| Fehlgeschlagene Aufnahmen (24 h) | Mit Fehler beendete Aufnahmen der letzten 24 Stunden          |
+| Wird aufgenommen                 | „Titel (Sender)“ dessen, was aufnimmt („—“ sonst)             |
+| Nächste Aufnahme                 | „Titel · Sender · Fr. 20:30“ („—“, wenn nichts geplant ist)   |
+| Freier Speicher                  | Freier Speicher des Aufnahmeordners, in GB                    |
+| Freier Speicher (%)              | Dasselbe, in Prozent                                          |
+| Zuschauer                        | Leute, die einen Sender schauen (Kodi, Browser…), Admin-Konto |
+| Belegte Tuner                    | Belegte Tuner (Eingänge), Administratorkonto                  |
+
+Es gibt kein Gerät pro Tuner: Tvheadend listet nur die belegten Tuner.
+
+## Dashboard
+
+Das Widget **Tvheadend-Aufnahmen** zeigt, was gerade aufnimmt (Titel, Sender
+und Ende), oder die nächste Aufnahme; Kacheln für die geplanten Aufnahmen, den
+freien Speicher und (Administratorkonto) die Zuschauer; dann eine Zeile pro
+laufender und kommender Aufnahme.
+
+## Szenen
+
+### Auslöser
+
+Die Aufnahme-Auslöser lassen sich auf einen Sender beschränken: Gib seinen
+Namen so ein, wie Tvheadend ihn anzeigt (leer: alle Sender).
+
+- **Eine Aufnahme startet**: Tvheadend beginnt aufzunehmen, mit Titel, Sender,
+  Endzeit und geplanter Dauer.
+- **Eine Aufnahme ist fertig**: Eine Aufnahme ist beendet und ihre Datei liegt
+  auf der Festplatte, mit Titel, Sender, Dauer und Anzahl der Stream-Fehler.
+- **Eine Aufnahme schlägt fehl**: Eine Aufnahme endete mit einem Fehler (kein
+  Signal, kein Tuner frei, Datei nicht erstellt, Zeit verpasst…), mit dem Grund
+  von Tvheadend, auf Englisch.
+- **Jemand schaut fern**: Ein Client beginnt, einen Sender zu schauen, mit
+  Sender, Tvheadend-Benutzer und Client. Auf einen Sender oder einen Benutzer
+  beschränkbar. Braucht ein Administratorkonto.
+- **Freier Speicher unter einer Schwelle**: Wähle 5, 10, 15, 20 oder 25 %; löst
+  einmal aus, und erst wieder, wenn der freie Speicher darüber gestiegen ist.
+
+Die Integration merkt sich, was sie gesehen hat: Ein Neustart von Gladys meldet
+keine Aufnahme zweimal, und eine inzwischen beendete Aufnahme wird einmal
+gemeldet.
+
+### Aktionen
+
+- **Sender jetzt aufnehmen**: Nimmt einen Sender (Name oder Nummer, wie
+  Tvheadend sie anzeigt) ab jetzt auf, 1 bis 720 Minuten, mit optionalem Titel.
+  Gibt Titel, Sender, Start- und Endzeit.
+- **Aufnahmen-Überblick**: Liest Tvheadend für die nächsten Aktionen: laufende
+  und geplante Aufnahmen, was aufnimmt, die nächste Aufnahme (Titel, Sender,
+  Zeit), den freien Speicher und einen fertigen Satz („1 laufende Aufnahme(n)
+  (Tagesschau), nächste: Film · ARD · Fr. 20:30, 120 GB frei (24 %)“).
+
+### Szenen-Ideen
+
+- **Fehler-Alarm**: „Eine Aufnahme schlägt fehl“ schickt dir eine Nachricht mit
+  Titel und Grund, damit du sie erneut planst.
+- **Niemand zu Hause um 19:55**: Wenn die Alarmanlage an ist, nimmt „Sender
+  jetzt aufnehmen“ die Nachrichten 20 Minuten lang auf.
+- **Festplatte fast voll**: „Freier Speicher unter einer Schwelle“ (10 %)
+  schickt eine Benachrichtigung; eine Morgenszene sagt den Satz von
+  „Aufnahmen-Überblick“.
+- **Kinomodus**: „Jemand schaut fern“ mit dem Wohnzimmer-Konto dimmt das Licht.
+
+## Fehlerbehebung
+
+- **Tvheadend antwortet nicht**: Prüfe Adresse und Port 9981 von dem Rechner
+  aus, auf dem Gladys läuft.
+- **Benutzername oder Passwort abgelehnt (oder kein Recht auf die
+  Weboberfläche)**: Tvheadend antwortet gleich auf ein falsches Passwort und auf
+  ein Konto ohne das Recht **Weboberfläche**; prüfe beides.
+- **Das Konto hat kein Aufnahmerecht**: Kreuze **Videorekorder** im
+  Zugangseintrag des Benutzers an.
+- **Keine Zuschauer, keine Tuner**: Das Konto ist kein Administrator (der
+  Verbindungstest sagt es); der Rest funktioniert.
+- **Eine mittendrin unterbrochene Aufnahme ist „fertig“**: Tvheadend selbst
+  meldet einen während der Aufnahme verlorenen Stream als „Completed OK“; nur
+  ein Stream, der beim Start fehlt, schlägt fehl.
+
+## Grenzen
+
+- Ein Tvheadend-Server pro Integration.
+- Tvheadend wird im gewählten Intervall gelesen (standardmäßig 30 Sekunden),
+  nicht in Echtzeit: Ein Zuschauer, der kürzer als das Intervall schaut, kann
+  übersehen werden.
+- Der Grund eines Fehlers ist der von Tvheadend, auf Englisch.
+- Kein Gerät pro Tuner, weder Signal noch SNR: Tvheadend listet nur die
+  belegten Tuner.
+- Die Szenen-Aktion plant eine Aufnahme; sie bricht keine ab und löscht keine.
+- Nicht mit dem Tvheadend-Projekt verbunden.

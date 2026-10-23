@@ -31,16 +31,21 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
+index.js                          SDK wiring only: src/app.js registers the handlers before connect()
+src/app.js                        every SDK handler -> the hub (also used by the tests)
+src/hub.js                        reading timer, recording transitions, disk thresholds, viewers -> scene events, views
+src/devices.js                    the server device: features, names, values
+src/tvheadend/client.js           the HTTP API (fetch), Digest/Basic, errors by kind, normalization
+src/tvheadend/digest.js           HTTP Digest (from gladys-fritzbox)
 src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
-src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
+src/widgets.js                    dashboard widget `recordings` (manifest `widgets`)
+src/texts.js                      connection, error, report and action texts, dates (4 languages)
+src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults), address, local/cloud
+src/store.js, src/problems.js     /data/tvheadend-state.json; one log line per repeated failure
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (en and fr mandatory)
 test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+                                  and helpers/fakeTvheadend.js (built on test/fixtures/tvheadend)
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,8 +75,10 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in English, French, German and Spanish: action
+  messages, widget content, feature names, scene outputs, manifest texts, and
+  `docs/en.md`, `docs/fr.md`, `docs/de.md`, `docs/es.md`, kept in sync
+  (`test/i18n.test.js` checks the languages and the doc sections).
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -197,6 +204,45 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
 - Les filtres de scène ne font qu'égalité et appartenance : un seuil reste le travail d'un capteur.
 - **Les clés de widgets, de déclencheurs et d'actions sont figées une fois publiées.**
 - `gladys_version` `>=5.1.0` dès qu'il y a widgets, déclencheurs ou actions de scène.
+
+## Tvheadend (propre à ce dépôt)
+
+Vérifié le 23/10/2026 sur Tvheadend 4.3-2897 (image `lscr.io/linuxserver/tvheadend`), réponses dans
+`test/fixtures/tvheadend`.
+
+- **Authentification** : Digest par défaut (Basic seulement si le réglage « plain » est actif). **Un
+  mauvais mot de passe répond 403, pas 401**, comme un droit manquant : `/api/serverinfo` en 403 =
+  identifiants refusés **ou** compte sans le droit « Interface web » (sans lui, tout l'API répond 403,
+  même avec les droits d'enregistrement). Le client réessaie une fois avec un nonce neuf après un 403
+  sur un nonce réutilisé. Le `uri` du Digest inclut le préfixe `--http_root` et la query string.
+- **Droits** : un compte « Interface web » + « Enregistreur vidéo » lit les grilles DVR, les chaînes,
+  `/comet/poll` et crée des enregistrements. `/api/status/subscriptions` et `/api/status/inputs`
+  exigent **admin** : sans lui, pas de lectures ni de tuners (pas de faux 0), redemandés toutes les
+  10 min. Les nouvelles entrées d'accès peuvent mettre quelques secondes à s'appliquer.
+- **Grilles DVR** : `grid_upcoming` contient les programmés **et** les enregistrements en cours
+  (`sched_status` `recording`). Un échec sans fichier (`File not created`, 104) n'est **pas** dans
+  `grid_failed` mais dans `grid_removed` : on lit donc `grid` filtré
+  (`filter=[{"field":"sched_status","type":"string","value":"completed"}]`, sous-chaîne, donc
+  `completed*`), trié par `stop` décroissant, 50 au plus. `completedRerecord` (« File missing ») =
+  aucun flux au départ : compté comme échec.
+- **Flux coupé en cours d'enregistrement** : Tvheadend termine en `completed` / « Completed OK », sans
+  erreur (vérifié). Seul un flux absent au départ échoue (`No input source available` puis
+  `completedRerecord`). Le dire dans la doc.
+- **Espace disque** : pas d'API REST ; le premier message de `/comet/poll` (`accessUpdate`) porte
+  `freediskspace` / `totaldiskspace` (octets) pour un compte avec droit DVR. Un appel par cycle.
+- **Lectures** : un abonnement est un spectateur s'il a `hostname` ou `client` et que son `title` ne
+  commence pas par `DVR:` (l'EPG `epggrab` et le scan n'ont pas d'adresse).
+- **Tuners** : `/api/status/inputs` ne liste que les entrées en service : pas d'appareil par tuner.
+- **Transitions** (`src/hub.js`) : première lecture d'un serveur = états posés sans événement ; une
+  entrée jamais vue terminée après la dernière lecture enregistrée (`saved.readAt`) est annoncée ; un
+  seuil de place libre est réarmé 2 points au-dessus.
+- Session de test : réseau `gladys-test-tvh`, `lscr.io/linuxserver/tvheadend` (volume
+  `/recordings` à `chown 1000` sinon « Unable to create file »), sources
+  `mirror.gcr.io/linuxserver/ffmpeg` en boucle (`-f lavfi -i testsrc … -c:v mpeg2video -c:a mp2 -f
+mpegts -listen 1 http://0.0.0.0:8080/tv.ts`), réseau IPTV automatique sur un m3u
+  `file:///config/test.m3u`, puis `api/service/mapper/save` pour créer les chaînes ; comptes créés
+  par `api/access/entry/create` + `api/passwd/entry/create` pendant que l'accès anonyme du premier
+  démarrage est encore ouvert, puis désactivé.
 
 ## Store
 
