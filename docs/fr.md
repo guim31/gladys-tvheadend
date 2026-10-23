@@ -159,4 +159,6 @@ annoncé une fois.
   utilisés.
 - L'action de scène programme un enregistrement ; elle n'en annule ni n'en
   supprime aucun.
+- « Une lecture commence » se déclenche une fois par client (adresse, utilisateur, application) : changer de chaîne ne la relance pas.
+- Un enregistrement dont le fichier est ensuite déplacé ou supprimé reste un enregistrement terminé.
 - Sans lien avec le projet Tvheadend.

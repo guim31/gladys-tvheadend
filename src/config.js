@@ -25,10 +25,9 @@ export const DEFAULT_CONFIG = {
 };
 
 // A URL copied from the browser points at a page of Tvheadend (its web
-// interface, an API call, a stream or a playlist): the API lives at the root
-// (or under the --http_root path).
-const INTERFACE_PATH =
-  /\/((extjs|index|simple)\.html|(api|stream|play|playlist|xmltv|tv)(\/.*)?)$/i;
+// interface or an API call): the API lives at the root (or under the
+// --http_root path, which may well be /tv: kept).
+const INTERFACE_PATH = /\/((extjs|index|simple)\.html|api(\/.*)?)$/i;
 
 /**
  * Parse the address typed by the user into a base URL: a bare host or IP

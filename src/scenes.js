@@ -30,8 +30,9 @@ export const SCENE_ACTIONS = {
       next_title: next?.title ?? '',
       next_channel: next?.channel ?? '',
       next_time: next?.start ? formatWhen(next.start, language, hub.now()) : '',
-      free_gb: view.disk?.freeGb ?? 0,
-      free_percent: view.disk?.freePercent ?? 0,
+      // Unknown: no value rather than a false 0 a condition would act on.
+      free_gb: view.disk?.freeGb ?? null,
+      free_percent: view.disk?.freePercent ?? null,
       sentence: hub.sentence(view, language),
     };
   },

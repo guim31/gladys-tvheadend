@@ -155,4 +155,6 @@ vez.
 - Sin dispositivo por sintonizador, ni señal ni SNR: Tvheadend solo lista los
   sintonizadores en uso.
 - La acción de escena programa una grabación; no anula ni borra ninguna.
+- «Empieza una reproducción» se dispara una vez por cliente (dirección, usuario, aplicación): cambiar de canal no lo vuelve a disparar.
+- Una grabación cuyo archivo se mueve o se borra después sigue siendo una grabación terminada.
 - Sin relación con el proyecto Tvheadend.

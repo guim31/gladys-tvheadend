@@ -139,9 +139,21 @@ export function normalizeEntry(raw) {
   if (!raw || typeof raw !== 'object' || typeof raw.uuid !== 'string' || !raw.uuid) {
     return null;
   }
-  const phase = phaseOf(raw.sched_status);
+  let phase = phaseOf(raw.sched_status);
   if (!phase) {
     return null;
+  }
+  // A recording whose file was moved or deleted afterwards (a post-processing
+  // script, the user) turns into completedError "File missing", with no
+  // error at all; a recording without input says "File missing" too, but
+  // with errors (checked on Tvheadend 4.3).
+  if (
+    phase === 'failed' &&
+    raw.status === 'File missing' &&
+    count(raw.errorcode) === 0 &&
+    count(raw.errors) + count(raw.data_errors) === 0
+  ) {
+    phase = 'finished';
   }
   return {
     uuid: raw.uuid.slice(0, 64),
@@ -177,6 +189,7 @@ export function isViewer(raw) {
 export function normalizeSubscription(raw) {
   return {
     id: String(raw.id ?? ''),
+    host: clean(raw.hostname, 100),
     channel: clean(raw.channel, 100),
     user: clean(raw.username, 100),
     client: clean(raw.client, 100) || clean(raw.title, 100),

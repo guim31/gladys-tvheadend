@@ -9,6 +9,7 @@ test('the address: a bare host gets port 9981, browser pages are dropped', () =>
   assert.equal(parseServerUrl('https://tv.example.org/tvh/'), 'https://tv.example.org/tvh');
   assert.equal(parseServerUrl('http://192.0.2.4:9981/api/serverinfo'), 'http://192.0.2.4:9981');
   assert.equal(parseServerUrl('https://tv.example.org'), 'https://tv.example.org');
+  assert.equal(parseServerUrl('https://example.org/tv'), 'https://example.org/tv', 'a proxy path');
   assert.equal(parseServerUrl('http://user:pass@192.0.2.4'), null, 'credentials have fields');
   assert.equal(parseServerUrl('ftp://192.0.2.4'), null);
   assert.equal(parseServerUrl('  '), null);

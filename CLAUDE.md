@@ -228,6 +228,14 @@ Vérifié le 23/10/2026 sur Tvheadend 4.3-2897 (image `lscr.io/linuxserver/tvhea
 - **Flux coupé en cours d'enregistrement** : Tvheadend termine en `completed` / « Completed OK », sans
   erreur (vérifié). Seul un flux absent au départ échoue (`No input source available` puis
   `completedRerecord`). Le dire dans la doc.
+- **Fichier déplacé ou supprimé après coup** (vérifié par un `mv`) : l'entrée passe de `completed` à
+  `completedError` « File missing », `errorcode` 0, `errors` 0. Un flux absent au départ donne aussi
+  « File missing » mais avec `errors` 1 : seule cette différence les sépare (`normalizeEntry`).
+- **Spectateurs** : un zapping (Kodi/HTSP) ouvre un nouvel abonnement ; le déclencheur compare donc
+  des clients (`hostname|username|client`), pas des id d'abonnement.
+- **Événements refusés** par Gladys (redémarrage) : la phase sauvée est remise à l'ancienne valeur
+  (et le seuil disque réarmé) pour réessayer au cycle suivant ; les états sont publiés avant les
+  événements.
 - **Espace disque** : pas d'API REST ; le premier message de `/comet/poll` (`accessUpdate`) porte
   `freediskspace` / `totaldiskspace` (octets) pour un compte avec droit DVR. Un appel par cycle.
 - **Lectures** : un abonnement est un spectateur s'il a `hostname` ou `client` et que son `title` ne

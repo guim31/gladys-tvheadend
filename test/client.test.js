@@ -26,10 +26,11 @@ test('the real DVR grids: scheduled, recording, finished, failed (rerecord inclu
   assert.equal(upcoming[2].stop - upcoming[2].start, 3600_000);
   const recent = (await fixture('grid_recent')).entries.map(normalizeEntry);
   assert.deepEqual(
-    recent.slice(0, 4).map((e) => [e.title, e.phase, e.status]),
+    recent.slice(2, 6).map((e) => [e.title, e.phase, e.status]),
     [
-      ['Meteo test', 'finished', 'Completed OK'],
-      // No input at the start: Tvheadend says "File missing", rerecord pending.
+      // Its file moved away after the end: Tvheadend says "File missing", no error.
+      ['Meteo test', 'finished', 'File missing'],
+      // No input at the start: "File missing" too, but with an error.
       ['Sans signal', 'failed', 'File missing'],
       // The stream cut in the middle: Tvheadend calls it a success.
       ['Emission coupee', 'finished', 'Completed OK'],
@@ -53,6 +54,7 @@ test('viewers are the subscriptions of a client, not the recorder nor the EPG gr
   const viewers = await client(real({ entries })).viewers();
   assert.deepEqual(viewers[0], {
     id: entries[2].id.toString(),
+    host: '192.0.2.14',
     channel: 'Mire Test',
     user: 'admin',
     client: 'curl/8.23.0',

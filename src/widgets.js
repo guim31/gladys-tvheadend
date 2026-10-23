@@ -63,9 +63,13 @@ function message(text, language) {
 /** "→ 21:30 · Channel" for a recording running, "Fri 20:30 · Channel" for one to come. */
 function rowValue(entry, running, language, now) {
   const when = running
-    ? `${pick(TEXT.until, language)} ${formatClock(entry.stop, language)}`
-    : formatWhen(entry.start, language, now);
-  return fit([when, entry.channel].filter(Boolean).join(' · '), 40);
+    ? entry.stop
+      ? `${pick(TEXT.until, language)} ${formatClock(entry.stop, language)}`
+      : ''
+    : entry.start
+      ? formatWhen(entry.start, language, now)
+      : '';
+  return fit([when, entry.channel].filter(Boolean).join(' · ') || '—', 40);
 }
 
 async function get(hub, { language = 'en' } = {}) {

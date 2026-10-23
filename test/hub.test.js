@@ -99,6 +99,32 @@ test('a failure is announced, even one that never wrote a file', async (t) => {
   assert.equal(stateOf(world, FEATURE_KEYS.FAILED), 0);
 });
 
+test('an event Gladys refuses is fired again at the next read, the states before it', async (t) => {
+  const world = await createWorld();
+  await createDevices(world);
+  t.after(() => world.app.stop());
+  const uuid = world.tvh.add({ title: 'Match', start: world.clock.now() + MINUTE });
+  await world.hub.pollNow();
+  world.tvh.set(uuid, 'recording');
+  const publish = world.gladys.publishSceneEvent.bind(world.gladys);
+  let order = [];
+  world.gladys.publishSceneEvent = async () => {
+    throw new Error('connect ECONNREFUSED');
+  };
+  await world.hub.pollNow();
+  assert.deepEqual(keys(world), []);
+  world.gladys.publishSceneEvent = async (key, data) => {
+    order.push(['event', stateOf(world, FEATURE_KEYS.RECORDING)]);
+    return publish(key, data);
+  };
+  await world.hub.pollNow();
+  assert.deepEqual(keys(world), [TRIGGERS.STARTED]);
+  assert.deepEqual(order, [['event', 1]], 'the state was published before the event');
+  order = [];
+  await world.hub.pollNow();
+  assert.deepEqual(keys(world), [TRIGGERS.STARTED], 'once');
+});
+
 test('the first read only sets the states: the history is not news', async (t) => {
   const clock = createClock();
   const tvheadend = new FakeTvheadend({ now: clock.now });
@@ -185,6 +211,11 @@ test('a new viewer fires its trigger; the recorder and the EPG grabber are not v
   });
   await createDevices(world);
   assert.equal(stateOf(world, FEATURE_KEYS.VIEWERS), 2);
+  // Bob zaps: a new subscription of the same client is not a new viewer.
+  world.tvh.viewers.pop();
+  world.tvh.watch(1, 'bob');
+  await world.hub.pollNow();
+  assert.equal(world.fake.sceneEvents.filter((e) => e.key === TRIGGERS.VIEWER).length, 1);
 });
 
 test('a recorder-only account: no viewers nor tuners, everything else works', async (t) => {

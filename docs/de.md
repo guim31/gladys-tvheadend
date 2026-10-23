@@ -156,4 +156,6 @@ gemeldet.
 - Kein Gerät pro Tuner, weder Signal noch SNR: Tvheadend listet nur die
   belegten Tuner.
 - Die Szenen-Aktion plant eine Aufnahme; sie bricht keine ab und löscht keine.
+- „Jemand schaut fern“ löst einmal pro Client aus (Adresse, Benutzer, Anwendung): Ein Senderwechsel löst ihn nicht erneut aus.
+- Eine Aufnahme, deren Datei später verschoben oder gelöscht wird, bleibt eine fertige Aufnahme.
 - Nicht mit dem Tvheadend-Projekt verbunden.

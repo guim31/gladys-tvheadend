@@ -332,7 +332,18 @@ export class TvheadendHub {
     for (const [uuid, entry] of current) {
       const before = this.saved.recordings[uuid];
       if (!firstRead) {
+        const count = events.length;
         this.transition(entry, before, lastSeen, events);
+        // An event Gladys refuses (it restarts) is fired again at the next read.
+        for (const event of events.slice(count)) {
+          event.push(() => {
+            if (before === undefined) {
+              delete this.saved.recordings[uuid];
+            } else {
+              this.saved.recordings[uuid] = before;
+            }
+          });
+        }
       }
       if (before !== entry.phase) {
         this.saved.recordings[uuid] = entry.phase;
@@ -348,16 +359,20 @@ export class TvheadendHub {
     }
     dirty = this.observeDisk(firstRead, events) || dirty;
     this.observeViewers(events);
+    // The states first: a scene started by an event reads them up to date.
+    await this.publishStates();
+    for (const [key, data, rollback] of events) {
+      if (!(await this.fire(key, data)) && rollback) {
+        rollback();
+        dirty = true;
+      }
+    }
     if (dirty) {
       // The time of the read goes with the states it saw: a recording never
       // seen that ended after it is news after a restart.
       this.saved.readAt = this.readAt;
       this.store.save(this.saved);
     }
-    for (const [key, data] of events) {
-      await this.fire(key, data);
-    }
-    await this.publishStates();
   }
 
   /** One recording: its phase now against the saved one; queue the events. */
@@ -418,6 +433,9 @@ export class TvheadendHub {
           events.push([
             TRIGGERS.DISK_LOW,
             { threshold, free_percent: disk.freePercent, free_gb: disk.freeGb },
+            () => {
+              this.saved.lowDisk = this.saved.lowDisk.filter((t) => t !== threshold);
+            },
           ]);
         }
       } else if (announced && disk.freePercent >= threshold + DISK_REARM_POINTS) {
@@ -428,18 +446,26 @@ export class TvheadendHub {
     return dirty;
   }
 
-  /** Someone starts watching: a subscription id not seen at the last read. */
+  /**
+   * Someone starts watching: a client (address, user, application) not
+   * watching at the last read. Zapping opens a new subscription for the same
+   * client: not a new viewer.
+   */
   observeViewers(events) {
     if (this.viewers === null) {
       return;
     }
     const known = this.knownViewers;
-    this.knownViewers = new Set(this.viewers.map((viewer) => viewer.id));
+    const keyOf = (viewer) => `${viewer.host}|${viewer.user}|${viewer.client}`;
+    this.knownViewers = new Set(this.viewers.map(keyOf));
     if (known === null) {
       return;
     }
+    const fired = new Set();
     for (const viewer of this.viewers) {
-      if (!known.has(viewer.id)) {
+      const key = keyOf(viewer);
+      if (!known.has(key) && !fired.has(key)) {
+        fired.add(key);
         logger.debug(`New viewer on ${viewer.channel}`);
         events.push([
           TRIGGERS.VIEWER,
@@ -449,11 +475,15 @@ export class TvheadendHub {
     }
   }
 
+  /** @returns {Promise<boolean>} whether Gladys took the event */
   async fire(key, data) {
     try {
       await this.gladys.publishSceneEvent(key, data);
+      this.problems.recover('events', 'Scene events accepted again');
+      return true;
     } catch (err) {
-      logger.warn(`Scene event ${key} refused: ${err.message}`);
+      this.problems.fail('events', `Scene event ${key} refused: ${err.message}`);
+      return false;
     }
   }
 

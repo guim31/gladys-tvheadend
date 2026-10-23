@@ -148,4 +148,6 @@ recording twice, and a recording that ended meanwhile is announced once.
 - The failure reason is Tvheadend's, in English.
 - No per-tuner device, no signal or SNR: Tvheadend lists only the tuners in use.
 - The scene action schedules a recording; it neither cancels nor deletes one.
+- "Someone starts watching" fires once per client (address, user, application): changing channel does not fire it again.
+- A recording whose file is later moved or deleted stays a finished recording.
 - Not affiliated with the Tvheadend project.
