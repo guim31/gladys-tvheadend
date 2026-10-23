@@ -176,6 +176,6 @@ export const formatClock = (time, language) =>
     minute: '2-digit',
   }).format(time);
 
-/** A size in gigabytes, with the decimal separator of the language. */
-export const formatGb = (gb, language) =>
+/** A number with one decimal at most, with the decimal separator of the language. */
+export const formatNumber = (gb, language) =>
   new Intl.NumberFormat(LOCALES[language] ?? LOCALES.en, { maximumFractionDigits: 1 }).format(gb);

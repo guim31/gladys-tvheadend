@@ -28,7 +28,7 @@ import {
   ERROR_TEXT,
   REPORT_TEXT,
   formatClock,
-  formatGb,
+  formatNumber,
   formatWhen,
   pick,
 } from './texts.js';
@@ -679,7 +679,12 @@ export class TvheadendHub {
       view.scheduled[0] ? text.next(this.describe(view.scheduled[0], language)) : text.noNext,
     ];
     if (view.disk) {
-      parts.push(text.free(formatGb(view.disk.freeGb, language), view.disk.freePercent));
+      parts.push(
+        text.free(
+          formatNumber(view.disk.freeGb, language),
+          formatNumber(view.disk.freePercent, language),
+        ),
+      );
     }
     return parts.join(', ');
   }

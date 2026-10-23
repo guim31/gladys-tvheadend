@@ -18,7 +18,7 @@ import {
   CONNECTION_TEXT,
   ERROR_TEXT,
   formatClock,
-  formatGb,
+  formatNumber,
   formatWhen,
   labelled,
   pick,
@@ -105,7 +105,7 @@ async function get(hub, { language = 'en' } = {}) {
   if (view.disk) {
     components.push({
       type: 'value',
-      value: formatGb(view.disk.freeGb, language),
+      value: formatNumber(view.disk.freeGb, language),
       unit: pick(TEXT.gb, language),
       label: pick(TEXT.free, language),
       icon: 'hard-drive',
