@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-23
+
 ### Added
 
 - The Tvheadend server (4.2 or later) as a Gladys device: reachable,
@@ -27,3 +29,6 @@ the notes of the version's GitHub Release.
   the viewers.
 - HTTP Digest and Basic authentication, a "Test the connection" action, texts
   in English, French, German and Spanish.
+
+[Unreleased]: https://github.com/guim31/gladys-tvheadend/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-tvheadend/releases/tag/v1.0.0
